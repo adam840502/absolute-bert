@@ -132,9 +132,9 @@ def log_semantic_summary():
     with log_step(step=global_step, tag="semantic_summary"):
         summary = get_absolute_bert_semantic_summary(model, tokenizer)
         wandb_logger.dump_strings(
-            {f"{layer_name}.txt": semantic for layer_name, semantic in summary.items()}, 
-            "semantic_summary", 
-            global_step
+            {f"{layer_name}.txt": semantic for layer_name, semantic in summary.items()},
+            "semantic_summary",
+            global_step,
         )
 
 
@@ -229,13 +229,44 @@ for epoch_num in range(config.train.num_epochs):
     with torch.no_grad():
         run_benchmarks_and_log("beir", epoch_num)
 
-# model_artifact = wandb.Artifact(name="model",
-#   type="model",
-#   # description="trained with 2-1-training_with_msmarco",
-#   metadata=training_args_config)
-# model_artifact.add_dir(saving_dir)
-# run.log_artifact(model_artifact)
 
+from typing import Any
+from tempfile import TemporaryDirectory
+
+
+class ModelArtifact:
+
+    def __init__(
+        self,
+        model: torch.Module,
+        description: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ):
+        self.temp_path = TemporaryDirectory()
+        self.model = model
+        self.description = description
+        self.metadata = metadata
+
+    def generate(self) -> wandb.Artifact:
+        artifact = wandb.Artifact(
+            name="model",
+            type="model",
+            description=self.description,
+            metadata=self.metadata,
+        )
+        artifact.add_dir(self.temp_path.name)
+        return artifact
+
+    def delete(self):
+        self.temp_path.cleanup()
+
+
+model_artifact = ModelArtifact(
+    model,
+    "trained with 2-1-training_with_msmarco",
+    config.to_dict(),
+)
+run.log_artifact(model_artifact)
 # run.log_code(**get_code_files_aggregating_functions(cfg.env.project_root))
 
 # if not cfg.testing:
@@ -244,7 +275,7 @@ for epoch_num in range(config.train.num_epochs):
 
 #     trainer.save_model(saving_dir)
 #     trainer.save_state()
-#     torch.save(model, saving_dir/'pytorch.pt')
+#     torch.save(model, saving_dir / "pytorch.pt")
 
 """### for markdown recording"""
 
@@ -255,3 +286,4 @@ for epoch_num in range(config.train.num_epochs):
 #     print()
 
 wandb.finish()
+model_artifact.delete()
