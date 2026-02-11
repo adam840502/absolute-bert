@@ -1,3 +1,6 @@
+data
+worktree
+
 # .git
 # .gitignore
 __pycache__

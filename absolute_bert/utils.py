@@ -1,4 +1,3 @@
-
 from collections.abc import Callable
 from functools import partial
 from typing import Generic, TypeVar, get_args
@@ -20,7 +19,7 @@ class Registry(Generic[N, T]):
         if orig_class is not None:
             name_type = get_args(self.__orig_class__)[0]
             return f"<registry[{str(name_type)}]: {self._registry.keys()}>"
-        
+
         orig_bases = getattr(self, "__orig_bases__", None)
         if orig_bases is not None:
             for base in orig_bases:
@@ -29,10 +28,11 @@ class Registry(Generic[N, T]):
 
                 name_type = get_args(base)[0]
                 return f"<registry[{str(name_type)}]: {self._registry.keys()}>"
-            
+
         return f"<registry[Unknown]: {self._registry.keys()}>"
 
     def register(self, key: N) -> Callable[[T], T]:
+
         return partial(self._register, key)
 
     def _register(self, key: N, item: T) -> T:
@@ -45,8 +45,6 @@ class Registry(Generic[N, T]):
 
     def __getitem__(self, key: N) -> T:
         return self._registry.__getitem__(key)
-    
-
 
 
 def init_logging(level: str | None = None):
