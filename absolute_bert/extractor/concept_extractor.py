@@ -1,7 +1,7 @@
 from numpy.typing import NDArray
 from jaxtyping import Float, Int
 from sklearn.metrics.pairwise import cosine_similarity
-from torch.types import Tensor
+from torch import Tensor
 
 from absolute_bert.base_types import WordEmbeddings
 

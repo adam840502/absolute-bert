@@ -5,7 +5,8 @@ from enum import StrEnum
 
 import numpy as np
 from numpy.typing import NDArray
-from torch.types import Tensor, Number
+from torch import Tensor
+from torch.types import Number
 
 
 @dataclass

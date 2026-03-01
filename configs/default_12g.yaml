@@ -1,0 +1,45 @@
+wandb:
+  entity: "ghuang-nlp"
+  project: "absolute-bert"
+  job_type: "prototype"  # "sweep", "train"
+train:
+  model_type: "absolute_bert"
+  num_epochs: 3
+  max_steps: 30000
+# model_params:
+#   dims: 512
+micro_batch_sizes:
+  train: 48
+  val: 128
+  ir: 16
+optimizer:
+  lr: 1e-5
+scheduler:
+  warm_ratio: 0.07
+  type: "no_op"
+logging:
+  params:
+    every_n_steps: 2000
+    rules:
+      -
+        include:
+          - "base_model.layers.*.layer_norm.bias"
+          - "bias"
+          - "*.head_time_delta"
+        exclude: ["*.bias"]
+        methods: ["module_norm", "param_dist"]
+      -
+        include: ["*.log_time_angles"]
+        methods: ["param_dist"]
+      -
+       include: ["base_model.layers.*.layer_norm.weight"]
+       methods: ["param_mean"]
+      -
+        include: ["*.embedding*", "*.Q.weight", "*.K.weight", "*.V.weight"]
+        methods: ["norm_dist_along_last_dim"]
+  # train: 
+  #   every_n_effective_steps: 5
+  val:
+    every_n_steps: 2000
+  # ir:
+  #   every_n_steps: 2000

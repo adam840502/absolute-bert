@@ -236,6 +236,7 @@ for epoch_num in range(config.train.num_epochs):
         run_benchmarks_and_log("beir", epoch_num)
 
 
+from pathlib import Path
 from typing import Any
 from tempfile import TemporaryDirectory
 
@@ -244,11 +245,11 @@ class ModelArtifact:
 
     def __init__(
         self,
-        model: torch.Module,
+        model: torch.nn.Module,
         description: str | None = None,
         metadata: dict[str, Any] | None = None,
     ):
-        self.temp_path = TemporaryDirectory()
+        self.temp_dir = TemporaryDirectory()
         self.model = model
         self.description = description
         self.metadata = metadata
@@ -260,11 +261,14 @@ class ModelArtifact:
             description=self.description,
             metadata=self.metadata,
         )
-        artifact.add_dir(self.temp_path.name)
+        temp_path = self.temp_dir.name
+        torch.save(self.model.state_dict(), Path(temp_path) / "model.pt")
+        artifact.add_dir(temp_path)
         return artifact
 
     def delete(self):
-        self.temp_path.cleanup()
+        # logger.info(f"{self.temp_dir.name=}")
+        self.temp_dir.cleanup()
 
 
 model_artifact = ModelArtifact(
@@ -272,7 +276,7 @@ model_artifact = ModelArtifact(
     "trained with 2-1-training_with_msmarco",
     config.to_dict(),
 )
-run.log_artifact(model_artifact)
+run.log_artifact(model_artifact.generate())
 # run.log_code(**get_code_files_aggregating_functions(cfg.env.project_root))
 
 # if not cfg.testing:
