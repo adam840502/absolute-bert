@@ -9,3 +9,19 @@
 1. if the repo is fixed but not affect the image to run successfully, 
    start the container with command `scripts/sweep_run-pull_and_run.sh`:
    `docker run --gpus all  -e WANDB_API_KEY=your_api_key -e WANDB_SWEEP_ID=<entity_name>/<project_name>/<sweep_id> --rm sweep-run:latest scripts/sweep_run-pull_and_run.sh`
+
+
+## Vast.ai
+
+### on start script
+```
+cd /workspace
+
+apt-get update && apt-get install -y build-essential
+
+git clone https://github.com/tzuhanwen/absolute-bert.git
+cd absolute-bert
+git switch -f backup
+
+pip install -e ".[sweep]"
+```
