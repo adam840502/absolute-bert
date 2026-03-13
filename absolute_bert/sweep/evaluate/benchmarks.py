@@ -59,6 +59,8 @@ class BeirBenchmark:
         self.corpus_name = corpus_name
         self.corpus, self.queries, self.qrels = _load_or_download_corpus(corpus_name=corpus_name)
 
+        logging.getLogger("beir").setLevel("WARNING")
+
     def run(
         self,
         bi_encoder: BiEncoder,

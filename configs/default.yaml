@@ -3,9 +3,9 @@ wandb:
   project: "absolute-bert"
   job_type: "prototype"  # "sweep", "train"
 train:
-  model_type: "absolute_bert"
+  model_type: "roformer" # "absolute_bert"
   num_epochs: 3
-  max_steps: 30000
+  max_steps: 1000
 # model_params:
 #   dims: 512
 micro_batch_sizes:

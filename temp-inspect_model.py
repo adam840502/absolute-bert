@@ -7,7 +7,9 @@ import wandb
 from transformers import AutoTokenizer
 from umap import UMAP
 
-from absolute_bert.model.absolute_bert.models import AbsoluteBertLM
+from absolute_bert.base_types import LanguageModel
+# from absolute_bert.model.absolute_bert.models import AbsoluteBertLM as LM
+from absolute_bert.model.roformer.models import RoformerLM as LM
 from absolute_bert.sweep import setup
 from absolute_bert.utils import init_logging
 
@@ -21,22 +23,21 @@ config = config_unresolved.resolve(tokenizer.vocab_size)
 
 wandb.init()
 
-artifact = wandb.use_artifact("ghuang-nlp/absolute-bert/model:v17")
+artifact = wandb.use_artifact("ghuang-nlp/absolute-bert/model:v53")
 artifact_dir = artifact.download()
 artifact_path = Path(artifact_dir)
 
 states = torch.load(artifact_path / "model.pt", weights_only=True, map_location="cpu")
-model = AbsoluteBertLM(config.model)
+model: LanguageModel = LM(config.model)
 model.load_state_dict(states)
 
-embedding = model.base_model.embedding
 
-metric = "euclidean"
-# metric = "cosine"
+# metric = "euclidean"
+metric = "cosine"
 
 logger.info("start umap learning")
 learner = UMAP(metric=metric)
-transed = learner.fit_transform(model.base_model.embedding.weight.detach().numpy())
+transed = learner.fit_transform(model.word_embeddings.data.detach().numpy())
 
 # import numpy as np
 
@@ -103,4 +104,4 @@ def plotly_2d(
 
 
 fig = plotly_2d(transed.T)
-fig.write_html(f"v17-{metric}.html")
+fig.write_html(f"v53-{metric}.html")
