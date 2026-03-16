@@ -1,7 +1,7 @@
 from absolute_bert.utils import init_logging
 
 if __name__ == "__main__":
-    init_logging()
+    init_logging("DEBUG")
 
 # %%
 import logging

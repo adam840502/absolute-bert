@@ -79,7 +79,7 @@ class LanguageModelUnresolved(ConfigUnresolved[LanguageModelConfig]):
 
     def resolve(self, model_type: LanguageModelType, vocab_size: int) -> LanguageModelConfig:
         logger.debug(
-            f"start of LanguageModelUnresolved.resolve, {model_type=}, {lm_config_registry=}"
+            f"start of LanguageModelUnresolved.resolve, {self.kwargs=}, {model_type=}, {lm_config_registry=}"
         )
         return lm_config_registry[model_type](**self.kwargs | {"vocab_size": vocab_size})
 
