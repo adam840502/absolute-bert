@@ -58,12 +58,11 @@ class AbsoluteBertLayerConfig(Config):
 class AbsoluteBertConfig(LanguageModelConfig):
     vocab_size: int
     dim: int = 512
-    num_heads: int = 8
     hidden_dim: int | None = None
     time_dim: int = 64
     activation_dim: int = 3 * 512
     depth: int = 8
-    log_granularity: Sequence[int] = (6, 6, 6, 6, 6, 6, 6, 6)
+    log_granularity: Sequence[int] | int = (6, 6, 6, 6, 6, 6, 6, 6)
     q_temperature: float = 0.5
     k_temperature: float = 0.5
     dtype: torch.dtype = torch.float
@@ -71,6 +70,10 @@ class AbsoluteBertConfig(LanguageModelConfig):
     # attention_type: Absolute_global_attention
 
     def __post_init__(self) -> None:
+        if isinstance(self.log_granularity, int):
+            self.log_granularity = [self.log_granularity for _ in range(self.depth)]
+            return
+
         if len(self.log_granularity) != self.depth:
             raise AttributeError("log_granularity is about setting hidden_dim of each layer")
 
