@@ -62,9 +62,10 @@ def get_config(overrides: Any = {}, config_file: Path | None = None) -> Experime
 
 
 def main():
-    init_logging()
+    init_logging("DEBUG")
     config = get_config()
-    print(config.to_dict())
+    logger.debug(config.to_dict())
+    logger.debug(config.resolve(32))
 
 
 if __name__ == "__main__":

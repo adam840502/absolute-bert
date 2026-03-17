@@ -31,7 +31,7 @@ class TrainingArgs(Config):
     random_seed: int = 42
     val_ratio: float = 0.1
     max_steps: int = -1
-    clip_loss: float = 50
+    clip_loss: float = 15
     accum_steps: int = 4
 
 
@@ -73,15 +73,15 @@ class SchedulerUnresolved(ConfigUnresolved[SchedulerConfig]):
     warmup_ratio: float | None = None
 
 
+@dataclass
 class LanguageModelUnresolved(ConfigUnresolved[LanguageModelConfig]):
-    def __init__(self, **kwargs) -> None:
-        self.kwargs = kwargs
+    model_config: dict[Any, Any]
 
     def resolve(self, model_type: LanguageModelType, vocab_size: int) -> LanguageModelConfig:
         logger.debug(
-            f"start of LanguageModelUnresolved.resolve, {self.kwargs=}, {model_type=}, {lm_config_registry=}"
+            f"start of LanguageModelUnresolved.resolve, {self.model_config=}, {model_type=}, {lm_config_registry=}"
         )
-        return lm_config_registry[model_type](**self.kwargs | {"vocab_size": vocab_size})
+        return lm_config_registry[model_type](**self.model_config | {"vocab_size": vocab_size})
 
 
 @dataclass
@@ -112,6 +112,7 @@ class ExperimentUnresolved(_ConfigBase):
         if type_hooks is None:
             type_hooks = {}
         all_type_hooks = type_hooks | {
+            LanguageModelUnresolved: LanguageModelUnresolved,
             LanguageModelType: LanguageModelType,
             ExtractionType: ExtractionType,
         }
