@@ -9,9 +9,9 @@ train:
 # model_params:
 #   dims: 512
 micro_batch_sizes:
-  train: 48
+  train: 64
   val: 128
-  ir: 16
+  ir: 12
 optimizer:
   lr: 6e-4
 scheduler:
